@@ -1,12 +1,29 @@
 <script>
+	import { setContext, onDestroy } from 'svelte';
+	import Summary from './Summary.svelte';
 	import Services from './Services.svelte';
 	import Events from './Events.svelte';
+	import {createJokiPipeStore} from './jokiPipeStore.js';
 	
 	let openView = Events;
 	
+	const store = createJokiPipeStore();
+	store.init();
+
 	function changeView(value) {
 		openView = value;
 	}
+
+	setContext('store', store);
+
+	const unsub = store.subscribe(data => {
+
+	});
+
+	onDestroy( ()=> {
+		store.reset();
+		unsub();
+	});
 </script>
 
 <style>
@@ -64,6 +81,9 @@ nav > button.active {
 	<button on:click={() => changeView(Services)}>
 		Services
 	</button>
+	<button on:click={() => changeView(Summary)}>
+			Summary
+		</button>
 </nav>
 
 <svelte:component this={openView} />

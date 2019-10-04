@@ -11,7 +11,7 @@
 
     function toggle() {
         active = !active;
-        dispatch('buttonToggle', {from: 'ToggleButton.svelte', typeId: id, value: active});
+        dispatch('toggle', id);
     }
 
 </script>

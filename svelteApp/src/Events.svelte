@@ -1,19 +1,15 @@
 <script>
 	import { onDestroy } from 'svelte';
-	import { eventsStore } from './eventsStore.js'
+	import { getContext } from 'svelte';
+
 
 	import EventItem from './EventItem.svelte';
 	import ToggleButton from './ToggleButton.svelte';
 
 	let jokiEvents = [];
+	let filteredEvents = [...jokiEvents];
 
 	let newestFirst = true;
-
-	const unsub = eventsStore.subscribe(events => {
-		jokiEvents = events;
-		sortEvents();
-	});
-
 	let types = {
 		"ask": true,
 		"broadcast"	: true,
@@ -21,6 +17,17 @@
 		"serviceUpdate": true,
 	};
 
+
+	const store = getContext('store');
+
+	const unsub = store.subscribe(data => {
+		if(data && Array.isArray(data.events) && data.events.length !== jokiEvents.lenght) {
+			jokiEvents = data.events;
+			sortEvents();
+		}
+	});
+
+	
 
 
 	function sortEvents() {
@@ -30,7 +37,7 @@
 		} else {
 			jokiEvents = jokiEvents.sort((a, b) => a.timeStamp - b.timeStamp);
 		}
-		jokiEvents = jokiEvents.filter((ev) => {
+		filteredEvents = jokiEvents.filter((ev) => {
 			return types[ev.eventType];
 		});
 
@@ -38,8 +45,16 @@
 
 	function toggleTimeSort() {
 		newestFirst = !newestFirst;
+		sortEvents();	
+	}
+
+	function toggleFiltering(event) {
+		const tid = event.detail;
+		const newTypes = {...types};
+
+		newTypes[tid] = !newTypes[tid];
+		types = newTypes;
 		sortEvents();
-		
 	}
 
 	sortEvents();
@@ -98,7 +113,7 @@ div.filter-row > button.toggler.active:after {
 </style>
 
 <h1>
-	Events ({jokiEvents.length})
+	Events ({filteredEvents.length} / {jokiEvents.length})
 </h1>
 
 {#if jokiEvents.length === 0}
@@ -109,17 +124,20 @@ div.filter-row > button.toggler.active:after {
 
 <div class="filter-row">
 	<button on:click={toggleTimeSort}>{newestFirst ? "New first" : "Old first"}</button>
-	<ToggleButton text="Trigger" id="trigger"/>
+	<ToggleButton text="Trigger" id="trigger" on:toggle={toggleFiltering}/>
+	<ToggleButton text="Ask" id="ask" on:toggle={toggleFiltering}/>
+	<ToggleButton text="Broadcost" id="broadcast" on:toggle={toggleFiltering}/>
 	<!-- <button class="toggler" on:click={() => { typeToggler('trigger');}}>Trigger</button>
 	<button class="toggler" on:click={() => { typeToggler('trigger');}}>Ask</button>
 	<button class="toggler" on:click={() => { typeToggler('trigger');}}>Broadcast</button>
 	<button class="toggler" on:click={() => { typeToggler('trigger');}}>Ask</button> -->
 </div>
 
+
 {/if}
 
 
 
-{#each jokiEvents as jokiEvent}
+{#each filteredEvents as jokiEvent}
 <EventItem {jokiEvent} />
 {/each}
