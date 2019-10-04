@@ -1,0 +1,32 @@
+{
+    "manifest_version": 2,
+    "name": "Joki Developer Tools",
+    "version": "0.1.1",
+    "description": "A debugging and monitoring extensions for joki.js",
+    "icons": {
+        "48": "icon-48.png",
+        "64": "icon-64.png",
+        "128": "icon-128.png"
+    },
+    "content_scripts": [
+        {
+            "matches": ["<all_urls>"],
+            "run_at": "document_idle",
+            "js": ["content.js"]
+        }
+    ],
+    "background": {
+        "scripts": ["background.js"],
+        "persistent": false
+    },
+    "devtools_page": "./devtools.html",
+    "browser_action": {
+        "default_icon": {
+            "16": "icon-off-16.png",
+            "32": "icon-off-32.png",
+            "48": "icon-off-48.png"
+        }
+    },
+    "permissions": ["storage"],
+    "web_accessible_resources": ["svelteApp/public/*"]
+}
