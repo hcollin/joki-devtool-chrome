@@ -11,13 +11,13 @@ This is a very early version with a lot missing and buggy features and errors po
 
 ## Installation
 
-1. Pull this repository
-2. Set Chrome to development mode 
-    2.1. Open chrome with url: chrome://extensions/
-    2.2. Check the development mode
-3. Add local extension
-    3.1. Click **Load unpacked**
-    3.2. Add the folder where the extension is located and add it
-4. Profit!
+* Pull this repository
+* Set Chrome to development mode 
+  * Open chrome with url: chrome://extensions/ 
+  * Check the development mode
+* Add local extension
+  * Click **Load unpacked**
+  * Add the folder where the extension is located and add it
+* Profit!
 
 
