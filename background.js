@@ -29,7 +29,7 @@ chrome.runtime.onConnect.addListener(port => {
     function devToolDisconnect(port) {
         console.log("Disconnecting Joki Dev Tool to Background", port);
         port.onMessage.removeListener(devToolEventHandling);
-        const  key = port.sender.tab === undefined ? port.sender.id : port.sender.tab.id;
+        const key = port.sender.tab === undefined ? port.sender.id : port.sender.tab.id;
         // const connObj = Array.from(devToolConnections.values()).find(devcon => devcon.name === port.name);
         // const key = connObj !== undefined ? connObj.key : undefined;
         if (key !== undefined && devToolConnections.has(key)) {
@@ -67,8 +67,6 @@ function devToolInitialization(event, port) {
     });
     return true;
 }
-
-
 
 /**
  * Send full jokiData update to dev tool
@@ -234,13 +232,25 @@ chrome.runtime.onMessage.addListener((req, sender, sendResponse) => {
  */
 function handleContentScriptEvent(senderId, eventString) {
     const event = JSON.parse(eventString);
-
     switch (event.state) {
         case "initialize":
-            return initializeJokiInstance(senderId);
+            return initializeJokiInstance(senderId, event);
         case "event":
             return handleJokiEvent(senderId, JSON.parse(event.eventData));
+        case "serviceNew":
+            console.log("New service", event.data);
+            break;
+        case "serviceRemove":
+            console.log("Remove service", event.data);
+            break;
+        case "serviceUpdate":
+            console.log("Update service", event.data);
+            break;
+        case "serviceInitialize":
+            console.log("Init service", event.data);
+            break;
         default:
+            console.log("Unknown event", eventString);
             break;
     }
 }
@@ -255,16 +265,20 @@ function handleContentCommands(senderId, command) {
  * Handler for initialization event from joki
  * @param {number} senderId - The tabId of the content script
  */
-function initializeJokiInstance(senderId) {
-    console.log("INITIALIZE JOKI INSTANCE FOR ", senderId);
+function initializeJokiInstance(senderId, event) {
+    console.log("INITIALIZE JOKI INSTANCE FOR ", senderId, event.data);
 
     if (jokiInstanceData.has(senderId)) {
         return "This joki instance has already been initialized!";
     }
 
+    
     const initData = {
         events: [],
-        services: {},
+        services: event.data.services.reduce((obj, srv) => {
+            obj[srv.id] = srv;
+            return obj;
+        }, {}),
     };
 
     jokiInstanceData.set(senderId, initData);

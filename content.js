@@ -4,7 +4,7 @@ function jokiListener(event) {
         return;
     }
     if (event.data.type === "JOKI") {
-        // console.log("SEND Event to background", event.data);
+        // if(event.data.state !== "event") console.log("SEND Event to background", event.data.state, event.data.state !== "event", JSON.stringify(event.data));
         chrome.runtime.sendMessage({ jokiPipe: true, data: JSON.stringify(event.data) }, response => {
             if (chrome.runtime.lastError) {
                 console.warn("ContentScript:EventListener\n", chrome.runtime.lastError.message);
